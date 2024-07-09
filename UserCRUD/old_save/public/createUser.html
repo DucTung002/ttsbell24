@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create User</title>
+
+    <!-- Thêm đường dẫn đến các tệp Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2 class="mt-4 mb-4">Create User</h2>
+
+        <form>
+            <div class="form-group">
+                <label for="_id">User ID:</label>
+                <input type="text" class="form-control" id="_id" placeholder="Enter user ID" />
+            </div>
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" id="name" placeholder="Enter name" />
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="text" class="form-control" id="email" placeholder="Enter email" />
+            </div>
+            <div class="form-group">
+                <label for="address">Address:</label>
+                <input type="text" class="form-control" id="address" placeholder="Enter address" />
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone:</label>
+                <input type="text" class="form-control" id="phone" placeholder="Enter phone" />
+            </div>
+            <button type="button" class="btn btn-primary" onclick="createUser()">
+                Create User
+            </button>
+        </form>
+    </div>
+    <script>
+        async function createUser() {
+            let _id = document.getElementById("_id").value.trim();
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const address = document.getElementById("address").value;
+            const phone = document.getElementById("phone").value;
+
+            if (!_id) {
+                alert("User ID is required!");
+                return;
+            }
+
+            // Tiếp tục với quá trình tạo người dùng
+            const response = await fetch("/users", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ _id, name, email, address, phone }),
+            });
+
+            if (response.ok) {
+                // Chuyển hướng về trang index.html sau khi tạo người dùng thành công
+                window.location.href = "index.html";
+            } else {
+                alert("Failed to create user");
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Management</title>
+
+  <!-- Thêm đường dẫn đến các tệp Bootstrap -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      /* Giới hạn chiều rộng của container */
+    }
+
+    .btn-group {
+      margin-bottom: 20px;
+      /* Khoảng cách giữa nút "Create User" và bảng */
+    }
+
+    .user-table th,
+    .user-table td {
+      text-align: center;
+      /* Căn giữa văn bản trong các ô của bảng */
+    }
+
+    .user-actions {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .user-actions button {
+      margin: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Xin chào <span id="loggedInUsername"></span>!</h2>  
+    <div class="d-flex justify-content-between mb-3">
+      <button type="button" class="btn btn-danger" onclick="logout()">
+        Logout
+      </button>
+    </div>
+  <div class="container">
+    <h2 class="mt-4 mb-4">User Management</h2>
+    <div class="btn-group">
+      <button type="button" class="btn btn-primary" onclick="createUser()">
+        Create User
+      </button>
+    </div>
+
+    <h3 class="mt-4">Users:</h3>
+    <table class="table user-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Address</th>
+          <th>Phone</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="userTableBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    async function getUsers() {
+      const response = await fetch("/users");
+      const users = await response.json();
+
+      const userTableBody = document.querySelector("#userTableBody");
+      userTableBody.innerHTML = "";
+
+      users.forEach((user) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${user._id}</td>
+          <td>${user.name}</td>
+          <td>${user.email}</td>
+          <td>${user.address}</td>
+          <td>${user.phone}</td>
+          <td class="user-actions">
+            <button class="btn btn-info" onclick="editUser('${user._id}')">Edit</button>
+            <button class="btn btn-danger" onclick="deleteUser('${user._id}')">Delete</button>
+          </td>
+        `;
+        userTableBody.appendChild(row);
+      });
+    }
+
+    async function createUser() {
+      window.location.href = "createUser.html";
+    }
+
+    async function editUser(userId) {
+      window.location.href = `editUser.html?userId=${userId}`;
+    }
+
+    async function deleteUser(userId) {
+      const response = await fetch(`/users/${userId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        getUsers();
+      } else {
+        alert("Failed to delete user");
+      }
+    }
+
+    getUsers();
+
+    function logout() {
+      // Logout - Xóa thông tin người dùng khỏi localStorage
+      localStorage.removeItem('user');
+      window.location.href = "login.html";
+    }
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+      // Lấy token từ localStorage
+      const token = localStorage.getItem('token');
+
+      // Nếu có token, trích xuất thông tin người dùng và hiển thị
+      if (token) {
+          const decodedToken = jwt_decode(token);
+          const loggedInUsername = decodedToken.username;
+          document.getElementById("loggedInUsername").innerText = loggedInUsername;
+      } else {
+          // Nếu không có token, có thể chuyển hướng đến trang đăng nhập
+          window.location.href = "/login.html";
+      }
+  });
+  </script>
+</body>
+
+</html>

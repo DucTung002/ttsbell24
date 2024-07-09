@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit User</title>
+
+    <!-- Thêm đường dẫn đến các tệp Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2 class="mt-4 mb-4">Edit User</h2>
+
+        <form>
+            <div class="form-group">
+                <label for="_id">User ID:</label>
+                <input type="text" class="form-control" id="_id" placeholder="Enter user ID" readonly />
+            </div>
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" id="name" placeholder="Enter name" />
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="text" class="form-control" id="email" placeholder="Enter email" />
+            </div>
+            <div class="form-group">
+                <label for="address">Address:</label>
+                <input type="text" class="form-control" id="address" placeholder="Enter address" />
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone:</label>
+                <input type="text" class="form-control" id="phone" placeholder="Enter phone" />
+            </div>
+            <button type="button" class="btn btn-primary" onclick="updateUser()">
+                Update User
+            </button>
+        </form>
+    </div>
+
+    <script>
+        async function loadUserInfo() {
+            const params = new URLSearchParams(window.location.search);
+            const userId = params.get("userId");
+
+            if (userId) {
+                const user = await getUserById(userId);
+
+                if (user) {
+                    document.getElementById("_id").value = user._id;
+                    document.getElementById("name").value = user.name;
+                    document.getElementById("email").value = user.email;
+                    document.getElementById("address").value = user.address;
+                    document.getElementById("phone").value = user.phone;
+                } else {
+                    alert("User not found");
+                }
+            } else {
+                alert("User ID not provided in the URL");
+            }
+        }
+
+        async function updateUser() {
+            const userId = document.getElementById("_id").value;
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const address = document.getElementById("address").value;
+            const phone = document.getElementById("phone").value;
+
+            const response = await fetch(`/users/${userId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ name, email, address, phone }),
+            });
+
+            if (response.ok) {
+                // Chuyển về trang index.html sau khi cập nhật thành công
+                window.location.href = "index.html";
+            } else {
+                alert("Failed to update user");
+            }
+        }
+
+        // Hàm lấy thông tin người dùng theo ID
+        async function getUserById(userId) {
+            const response = await fetch(`/users/${userId}`);
+            if (response.ok) {
+                const user = await response.json();
+                return user;
+            } else {
+                return null;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", loadUserInfo);
+    </script>
+</body>
+
+</html>
